@@ -1,0 +1,39 @@
+name: Download and Upload Video
+
+on:
+  workflow_dispatch:
+    inputs:
+      video_url:
+        description: URL of the video to download
+        required: true
+        type: string
+      chat_id:
+        description: Target Telegram chat ID
+        required: true
+        type: string
+
+jobs:
+  upload-video:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install pyrogram tgcrypto yt-dlp
+
+      - name: Run upload bot
+        env:
+          TG_STRING_SESSION: ${{ secrets.TG_STRING_SESSION }}
+          TG_API_ID: ${{ secrets.TG_API_ID }}
+          TG_API_HASH: ${{ secrets.TG_API_HASH }}
+          VIDEO_URL: ${{ inputs.video_url }}
+          TARGET_CHAT_ID: ${{ inputs.chat_id }}
+        run: |
+          python upload_bot.py
